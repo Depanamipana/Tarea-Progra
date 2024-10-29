@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 4536451775672138636}
   - component: {fileID: 7420534690983391767}
   - component: {fileID: 379555724634614281}
-  - component: {fileID: -4388057458297632258}
   - component: {fileID: 3691218437957744951}
   - component: {fileID: 3675833667126440971}
   m_Layer: 9
@@ -134,28 +133,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.85, y: 0.3}
   m_EdgeRadius: 0
---- !u!114 &-4388057458297632258
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1199199424601616195}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a03a5e4c3751a643b06becfd5b218f7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: 200
-  shotCounter: 0
-  minTimeBetweenShots: 0.2
-  maxTimeBetweenShots: 1.5
-  audioSource: {fileID: 3691218437957744951}
-  shootSound: {fileID: 8300000, guid: c0a2813d7422c6144a1c68cabd7dc08f, type: 3}
-  shootSoundVolume: 0.5
-  EnemyLaser: {fileID: 6803498458253790993, guid: 8de9e33b96ff5b44d9dae3317804424a,
-    type: 3}
-  HitFX: {fileID: 6826884493935400440, guid: 463c2561591a6ff438c7f84ad44bd030, type: 3}
 --- !u!82 &3691218437957744951
 AudioSource:
   m_ObjectHideFlags: 0
@@ -265,6 +242,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 100
-  effectTagName: HitFX
   objectEffect: {fileID: 7979616569856727185, guid: b67972a1b78ec974593e15eeb29e6eaf,
     type: 3}
