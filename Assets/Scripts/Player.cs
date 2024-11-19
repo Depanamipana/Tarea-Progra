@@ -10,7 +10,12 @@ public class Player : MonoBehaviour
     [Tooltip("Player movement speed value.")]
     public float moveSpeed = 10f;
     [Tooltip("Padding for Player object's half don't go outside of MainCamera.")]
-    public Vector2 padding = new Vector2( 0.3f, 1f );
+    public Vector2 padding = new Vector2(0.3f, 1f);
+
+    [Header("Shield Properties")]
+    public bool shieldActive = false;  // ¿El escudo está activo?
+    public int shieldStrength = 0;     // Resistencia del escudo
+    public GameObject shieldVisual;    // Representación visual del escudo
 
     [Header("Player Cannon")]
     [Tooltip("Time in seconds that Ship waits until shoot again.")]
@@ -25,6 +30,7 @@ public class Player : MonoBehaviour
     public GameObject deathFX;
 
     public GameObject playerLaser;
+
     // Private Variables
     Coroutine firingCoroutine;
     float xMin;
@@ -36,6 +42,10 @@ public class Player : MonoBehaviour
     void Start()
     {
         SetupMoveBoundaries();
+        if (shieldVisual != null)
+        {
+            shieldVisual.SetActive(false); // Escudo visual desactivado al inicio
+        }
     }
 
     // Update is called once per frame
@@ -43,6 +53,88 @@ public class Player : MonoBehaviour
     {
         Move();
         Fire();
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("ShieldItem"))
+        {
+            ActivateShield(50); // Por ejemplo, el ítem otorga 50 puntos de escudo
+            Destroy(collision.gameObject); // Elimina el ítem de escudo
+            return;
+        }
+
+        DamageDealer damageDealer = collision.gameObject.GetComponent<DamageDealer>();
+
+        if (damageDealer)
+        {
+            TakeDamage(damageDealer.GetDamage());
+            damageDealer.Hit();
+        }
+    }
+
+    private void ActivateShield(int shieldPoints)
+    {
+        shieldActive = true;
+        shieldStrength += shieldPoints;
+
+        if (shieldVisual != null)
+        {
+            shieldVisual.SetActive(true); // Activa la representación visual del escudo
+        }
+    }
+
+    private void TakeDamage(int damage)
+    {
+        if (shieldActive)
+        {
+            shieldStrength -= damage;
+
+            if (shieldStrength <= 0)
+            {
+                shieldStrength = 0;
+                shieldActive = false;
+
+                if (shieldVisual != null)
+                {
+                    shieldVisual.SetActive(false); // Desactiva el escudo visual
+                }
+            }
+        }
+        else
+        {
+            health -= damage;
+
+            if (health <= 0)
+            {
+                Die();
+            }
+        }
+    }
+
+    private void Die()
+    {
+        // Load the GameOver Scene
+        FindObjectOfType<Level>().LoadGameOver();
+
+        deathFX.transform.position = transform.position;
+        deathFX.transform.rotation = Quaternion.identity;
+        deathFX.SetActive(true);
+
+        Destroy(gameObject);
+    }
+
+    private void Fire()
+    {
+        if (Input.GetButtonDown("Fire1"))
+        {
+            firingCoroutine = StartCoroutine(FireAtWill());
+        }
+
+        if (Input.GetButtonUp("Fire1"))
+        {
+            StopCoroutine(firingCoroutine);
+        }
     }
 
     IEnumerator FireAtWill()
@@ -61,60 +153,11 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void Fire()
-    {
-        if (Input.GetButtonDown("Fire1"))
-        {
-            firingCoroutine = StartCoroutine(FireAtWill());
-        }
-
-        if (Input.GetButtonUp("Fire1"))
-        {
-            StopCoroutine(firingCoroutine);
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        DamageDealer damageDealer = collision.gameObject.GetComponent<DamageDealer>();
-
-        if (damageDealer)
-        {
-            TakeDamage(damageDealer.GetDamage());
-
-            damageDealer.Hit();
-        }
-
-    }
-
-    private void TakeDamage(int damage)
-    {
-        health -= damage;
-
-        if (health <= 0)
-        {
-            Die();
-        }
-    }
-
-    private void Die()
-    {
-        // Load the GameOver Scene
-        FindObjectOfType<Level>().LoadGameOver();
-
-        deathFX.transform.position = transform.position;
-        deathFX.transform.rotation = Quaternion.identity;
-        deathFX.SetActive(true);
-
-        Destroy(gameObject);
-    }
-
     private void Move()
     {
         float deltaX = Input.GetAxisRaw("Horizontal") * moveSpeed * Time.deltaTime;
         float deltaY = Input.GetAxisRaw("Vertical") * moveSpeed * Time.deltaTime;
 
-        // Clamp Player movement to prevent him to go outside scene camera view
         float newXPos = Mathf.Clamp(transform.position.x + deltaX, xMin, xMax);
         float newYPos = Mathf.Clamp(transform.position.y + deltaY, yMin, yMax);
 
@@ -123,7 +166,6 @@ public class Player : MonoBehaviour
 
     private void SetupMoveBoundaries()
     {
-        // Get the Scene's mainCamera object
         Camera gameCamera = Camera.main;
 
         xMin = gameCamera.ViewportToWorldPoint(new Vector3(0, 0, 0)).x + padding.x;

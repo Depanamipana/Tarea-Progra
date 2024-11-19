@@ -4,18 +4,22 @@ using UnityEngine;
 
 public class NaveEnemiga4 : Enemy
 {
-    public Transform puntoA;  // Punto de inicio (izquierda)
-    public Transform puntoB;  // Punto de destino (derecha)
-    public float velocidadHorizontal = 2f; // Velocidad de movimiento entre puntos A y B
-    public float velocidadDescenso = 1f;   // Velocidad de descenso
-
-    private bool moviendoHaciaB = true;    // Direccion inicial, hacia el punto B
+    public Transform[] puntos;          // Arreglo de 4 puntos que el enemigo recorrerá
+    public float velocidad = 2f;        // Velocidad de movimiento
+    private int indiceActual = 0;       // Índice del punto actual
 
     // Start is called before the first frame update
     void Start()
     {
-        // La nave comienza en el punto A
-        transform.position = puntoA.position;
+        if (puntos.Length > 0)
+        {
+            // Asegurarse de que el enemigo comience en el primer punto
+            transform.position = puntos[0].position;
+        }
+        else
+        {
+            Debug.LogError("No se han asignado puntos al movimiento.");
+        }
     }
 
     // Sobrescribe el método Update de la clase Enemy
@@ -27,21 +31,16 @@ public class NaveEnemiga4 : Enemy
 
     void Mover()
     {
-        // Movimiento horizontal entre A y B
-        Vector3 destinoHorizontal = moviendoHaciaB ? puntoB.position : puntoA.position;
-        transform.position = Vector3.MoveTowards(transform.position, destinoHorizontal, velocidadHorizontal * Time.deltaTime);
+        if (puntos.Length == 0) return; // Si no hay puntos, no hacer nada
 
-        // Si alcanza el punto A o B, cambia de dirección y desciende
-        if (transform.position == destinoHorizontal)
+        // Mover hacia el punto actual
+        transform.position = Vector3.MoveTowards(transform.position, puntos[indiceActual].position, velocidad * Time.deltaTime);
+
+        // Verificar si se ha alcanzado el punto actual
+        if (Vector3.Distance(transform.position, puntos[indiceActual].position) < 0.1f)
         {
-            moviendoHaciaB = !moviendoHaciaB; // Cambia entre A y B
-            Descender();                      // Baja un poco
+            // Pasar al siguiente punto
+            indiceActual = (indiceActual + 1) % puntos.Length;
         }
-    }
-
-    void Descender()
-    {
-        // Desciende en el eje Y hacia abajo
-        transform.position += Vector3.down * velocidadDescenso;
     }
 }

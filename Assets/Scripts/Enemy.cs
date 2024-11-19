@@ -19,6 +19,11 @@ public class Enemy : MonoBehaviour
     public GameObject EnemyLaser;
     public GameObject HitFX;
 
+    [Header("Shooting Angles")]
+    public Vector2 leftShotDirection = new Vector2(-1, -1); // Hacia el costado izquierdo
+    public Vector2 rightShotDirection = new Vector2(1, -1); // Hacia el costado derecho
+    public Vector2 downShotDirection = new Vector2(0, -1);  // Hacia abajo (ya existente)
+
     // Start is called before the first frame update
     void Start()
     {
@@ -29,14 +34,12 @@ public class Enemy : MonoBehaviour
     public virtual void Update()
     {
         CountDownToShoot();
-
-        
     }
 
     private void CountDownToShoot()
     {
         shotCounter -= Time.deltaTime;
-        if ( shotCounter <= 0f)
+        if (shotCounter <= 0f)
         {
             Fire();
             shotCounter = Random.Range(minTimeBetweenShots, maxTimeBetweenShots);
@@ -45,12 +48,33 @@ public class Enemy : MonoBehaviour
 
     private void Fire()
     {
+        // Disparo hacia abajo
+        DispararEnDireccion(downShotDirection);
+
+        // Disparo hacia el costado izquierdo
+        DispararEnDireccion(leftShotDirection);
+
+        // Disparo hacia el costado derecho
+        DispararEnDireccion(rightShotDirection);
+    }
+
+    private void DispararEnDireccion(Vector2 direccion)
+    {
         GameObject laser = Instantiate(EnemyLaser);
         if (laser != null)
         {
-            laser.transform.position = transform.position;
-            laser.transform.rotation = Quaternion.identity;
+            laser.transform.position = transform.position; // Inicia desde la posición del enemigo
+            laser.transform.rotation = Quaternion.identity; // Sin rotación inicial
             laser.SetActive(true);
+
+            // Asignar velocidad o dirección al proyectil
+            Rigidbody2D rb = laser.GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                rb.velocity = direccion.normalized * 5f; // Ajustar velocidad
+            }
+
+            // Reproducir sonido de disparo
             audioSource.PlayOneShot(shootSound, shootSoundVolume);
         }
     }
@@ -59,7 +83,7 @@ public class Enemy : MonoBehaviour
     {
         DamageDealer damageDealer = collision.gameObject.GetComponent<DamageDealer>();
 
-        if ( damageDealer)
+        if (damageDealer)
         {
             TakeDamage(damageDealer.GetDamage());
 
