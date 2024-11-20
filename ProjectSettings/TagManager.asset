@@ -12,6 +12,7 @@ TagManager:
   - ExplosionFX
   - HitFX
   - ShieldItem
+  - DisparoItem
   layers:
   - Default
   - TransparentFX
