@@ -1,24 +1,44 @@
+using System.Collections;
 using UnityEngine;
 
-public class Item : MonoBehaviour
+public abstract class Item : MonoBehaviour
 {
-    [Tooltip("Efecto visual o sonido al recoger el objeto (opcional).")]
-    public GameObject pickupEffect;
+    [Header("Item Properties")]
+    public float effectDuration = 0f; // Duración del efecto en segundos
+    public bool useEffectDuration = false; // Si es verdadero, el efecto tendrá duración limitada
 
-    protected virtual void OnPickup(GameObject player)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (pickupEffect)
+        if (other.CompareTag("Player"))
         {
-            Instantiate(pickupEffect, transform.position, Quaternion.identity);
+            OnPickup(other.gameObject);
+
+            if (useEffectDuration && effectDuration > 0)
+            {
+                // Aseguramos que se ejecute la rutina correctamente
+                StartCoroutine(ApplyEffectWithDuration(other.gameObject));
+            }
+            else
+            {
+                Destroy(gameObject); // Elimina el ítem inmediatamente
+            }
         }
-        Destroy(gameObject);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    // Método para aplicar el efecto con duración
+    private IEnumerator ApplyEffectWithDuration(GameObject player)
     {
-        if (collision.CompareTag("Player"))
-        {
-            OnPickup(collision.gameObject);
-        }
+        yield return new WaitForSeconds(effectDuration);
+        OnEffectEnd(player); // Finaliza el efecto después del tiempo
+        Destroy(gameObject); // Destruye el ítem
+    }
+
+    // Método base para aplicar el efecto (debe ser implementado por los hijos)
+    protected abstract void OnPickup(GameObject player);
+
+    // Método base para finalizar el efecto (opcional, implementado por los hijos si es necesario)
+    protected virtual void OnEffectEnd(GameObject player)
+    {
+        Debug.Log("Efecto finalizado: " + gameObject.name);
     }
 }

@@ -3,17 +3,15 @@ using UnityEngine;
 public class HealthItem : Item
 {
     [Header("Health Item Properties")]
-    public int healthAmount = 20;
+    public int healthIncrease = 20;
 
     protected override void OnPickup(GameObject player)
     {
-        base.OnPickup(player);
-
         Player playerScript = player.GetComponent<Player>();
-        if (playerScript)
+        if (playerScript != null)
         {
-            playerScript.health += healthAmount;
-            Debug.Log($"Vida aumentada en {healthAmount}. Vida actual: {playerScript.health}");
+            playerScript.health += healthIncrease;
+            Debug.Log($"Vida aumentada en {healthIncrease}. Vida actual: {playerScript.health}");
         }
     }
 }

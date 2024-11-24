@@ -1,32 +1,26 @@
-using System.Collections;
 using UnityEngine;
 
 public class RapidFireItem : Item
 {
-    [Header("Rapid Fire Item Properties")]
-    public float fireRateMultiplier = 0.5f; // Reduce el tiempo entre disparos a la mitad
-    public float boostDuration = 5f;
+    public float fireRateMultiplier = 0.5f;
 
     protected override void OnPickup(GameObject player)
     {
-        base.OnPickup(player);
-
         Player playerScript = player.GetComponent<Player>();
-        if (playerScript)
+        if (playerScript != null)
         {
-            StartCoroutine(EnableRapidFire(playerScript));
-            Debug.Log($"Disparo rápido activado por {boostDuration} segundos.");
+            playerScript.fireRate *= fireRateMultiplier;
+            Debug.Log($"Disparo rápido activado. Nuevo rate: {playerScript.fireRate}");
         }
     }
 
-    private IEnumerator EnableRapidFire(Player player)
+    protected override void OnEffectEnd(GameObject player)
     {
-        float originalFireRate = player.fireRate;
-        player.fireRate *= fireRateMultiplier;
-
-        yield return new WaitForSeconds(boostDuration);
-
-        player.fireRate = originalFireRate;
-        Debug.Log("Disparo rápido desactivado.");
+        Player playerScript = player.GetComponent<Player>();
+        if (playerScript != null)
+        {
+            playerScript.fireRate /= fireRateMultiplier;
+            Debug.Log("Disparo rápido desactivado.");
+        }
     }
 }
