@@ -134,5 +134,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b825ad8ab1626c2448041551b44ac58b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effectDuration: 0
-  useEffectDuration: 0
+  effectDuration: 5
+  useEffectDuration: 1

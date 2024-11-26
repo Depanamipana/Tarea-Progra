@@ -135,5 +135,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   effectDuration: 5
-  useEffectDuration: 0
-  fireRateMultiplier: 0.12
+  useEffectDuration: 1
+  fireRateMultiplier: 0.02
