@@ -13585,6 +13585,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4019682710987030722, guid: e448d5db2689d7c49b9235b92bc730a2,
         type: 3}
+      propertyPath: health
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 4019682710987030722, guid: e448d5db2689d7c49b9235b92bc730a2,
+        type: 3}
       propertyPath: deathFX
       value: 
       objectReference: {fileID: 1145533745}
